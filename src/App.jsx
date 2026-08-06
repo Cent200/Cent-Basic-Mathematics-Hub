@@ -228,3 +228,102 @@ function LessonView({ lesson, onBack }) {
     </div>
   );
 }
+function PaymentModal({ course, onClose, onConfirm }) {
+  const [method, setMethod] = useState("card");
+  const [step, setStep] = useState("details");
+  const [copied, setCopied] = useState(false);
+
+  const copyAccount = () => {
+    navigator.clipboard?.writeText(BANK.accountNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-[#22303C]/60 flex items-center justify-center p-4 z-50">
+      <div className="bg-[#F7F5F0] rounded-sm max-w-sm w-full p-7 relative">
+        <button onClick={onClose} className="absolute top-5 right-5 text-[#6B7280] hover:text-[#22303C]">
+          <X size={18} />
+        </button>
+        {step === "details" ? (
+          <>
+            <h3 className="font-serif text-2xl mb-1" style={{ fontFamily: "Fraunces, serif" }}>{course.title}</h3>
+            <p className="text-sm text-[#6B7280] mb-5">₦{Number(course.price).toLocaleString()} · one-time payment</p>
+
+            <div className="flex border border-[#D8D3C8] rounded-sm overflow-hidden mb-5 text-sm">
+              <button
+                onClick={() => setMethod("card")}
+                className={`flex-1 py-2.5 transition-colors ${method === "card" ? "bg-[#22303C] text-[#EDEAE3]" : "bg-white text-[#6B7280]"}`}
+              >
+                Card
+              </button>
+              <button
+                onClick={() => setMethod("transfer")}
+                className={`flex-1 py-2.5 transition-colors ${method === "transfer" ? "bg-[#22303C] text-[#EDEAE3]" : "bg-white text-[#6B7280]"}`}
+              >
+                Bank transfer
+              </button>
+            </div>
+
+            {method === "card" ? (
+              <>
+                <div className="space-y-3 mb-5">
+                  <input placeholder="Email" className="w-full border border-[#D8D3C8] rounded-sm px-3 py-2.5 text-sm bg-white" />
+                  <input placeholder="Card number" className="w-full border border-[#D8D3C8] rounded-sm px-3 py-2.5 text-sm bg-white" />
+                  <div className="flex gap-3">
+                    <input placeholder="MM / YY" className="w-1/2 border border-[#D8D3C8] rounded-sm px-3 py-2.5 text-sm bg-white" />
+                    <input placeholder="CVC" className="w-1/2 border border-[#D8D3C8] rounded-sm px-3 py-2.5 text-sm bg-white" />
+                  </div>
+                </div>
+                <button onClick={() => setStep("done")} className="w-full bg-[#22303C] text-[#EDEAE3] py-3 rounded-sm text-sm hover:bg-[#1A252E] transition-colors">
+                  Pay ₦{Number(course.price).toLocaleString()}
+                </button>
+                <div className="text-[10px] text-[#9CA3AF] mt-3 font-mono text-center">
+                  demo form — connect Paystack or Flutterwave to charge real cards
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="border border-[#D8D3C8] rounded-sm bg-white divide-y divide-[#D8D3C8] mb-5">
+                  <div className="px-4 py-3 flex items-center justify-between">
+                    <div>
+                      <div className="text-[10px] font-mono uppercase text-[#9CA3AF]">Account number</div>
+                      <div className="font-mono text-lg">{BANK.accountNumber}</div>
+                    </div>
+                    <button onClick={copyAccount} className="text-[#6B7280] hover:text-[#22303C]">
+                      <Copy size={15} />
+                    </button>
+                  </div>
+                  <div className="px-4 py-3">
+                    <div className="text-[10px] font-mono uppercase text-[#9CA3AF]">Bank</div>
+                    <div>{BANK.bankName}</div>
+                  </div>
+                  <div className="px-4 py-3">
+                    <div className="text-[10px] font-mono uppercase text-[#9CA3AF]">Account name</div>
+                    <div>{BANK.accountName}</div>
+                  </div>
+                </div>
+                {copied && <div className="text-xs text-[#2F6E62] mb-3 -mt-2">Account number copied</div>}
+                <p className="text-xs text-[#6B7280] mb-5 leading-relaxed">
+                  Transfer ₦{Number(course.price).toLocaleString()} to the account above, then tap the button below to unlock the course.
+                </p>
+                <button onClick={() => setStep("done")} className="w-full bg-[#22303C] text-[#EDEAE3] py-3 rounded-sm text-sm hover:bg-[#1A252E] transition-colors">
+                  I've sent the transfer
+                </button>
+              </>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <CheckCircle2 size={36} className="mx-auto mb-4 text-[#2F6E62]" />
+            <h3 className="font-serif text-2xl mb-2" style={{ fontFamily: "Fraunces, serif" }}>You're in</h3>
+            <p className="text-sm text-[#6B7280] mb-6">Full access unlocked on this device. Learn at your own pace.</p>
+            <button onClick={onConfirm} className="w-full bg-[#22303C] text-[#EDEAE3] py-3 rounded-sm text-sm hover:bg-[#1A252E] transition-colors">
+              Start learning
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
